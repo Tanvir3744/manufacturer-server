@@ -119,13 +119,13 @@ async function run() {
         //review
         app.post('/review', async (req, res) => {
             const data = req.body;
-            const result = await reviewCollecttion.insertOne(data);
+            const result = await reviewCollection.insertOne(data);
             res.send(result);
         });
 
         app.get('/review', async (req, res) => {
             const query = {};
-            const cursor = reviewCollecttion.find(query);
+            const cursor = reviewCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
         })

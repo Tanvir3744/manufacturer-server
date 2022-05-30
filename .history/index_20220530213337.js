@@ -41,7 +41,6 @@ async function run() {
         const database = client.db('manufacturedb').collection('parts')
         const ordersCollection = client.db('manufacturedb').collection('orders');
         const usersCollection = client.db('manufacturedb').collection('users');
-        const reviewCollecttion = client.db('manufacturedb').collection('review');
         //getting products from database
         app.get('/products', async (req, res) => {
             const query = {};
@@ -108,27 +107,6 @@ async function run() {
             res.send(users);
         });
 
-        app.get('/admin/:email', async (req, res) => {
-            const email = req.params.email;
-            const user = await usersCollection.findOne({ email: email });
-            const isAdmin = user.role === 'admin';
-            res.send({ admin: isAdmin })
-          })
-
-        
-        //review
-        app.post('/review', async (req, res) => {
-            const data = req.body;
-            const result = await reviewCollecttion.insertOne(data);
-            res.send(result);
-        });
-
-        app.get('/review', async (req, res) => {
-            const query = {};
-            const cursor = reviewCollecttion.find(query);
-            const result = await cursor.toArray();
-            res.send(result);
-        })
     }
     finally {
 
