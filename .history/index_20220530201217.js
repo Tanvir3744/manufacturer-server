@@ -29,7 +29,7 @@ function varifyJWT(req, res, next) {
         if (err) {
             res.status(403).send({ massage: 'forbidden Access' })
         }
-        console.log('prev decoded email',decoded)
+        console.log(decoded)
         req.decoded = decoded;
         next()
     });

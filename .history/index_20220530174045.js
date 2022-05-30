@@ -1,9 +1,7 @@
 const express = require('express');
 const cors = require('cors')
-
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const { ObjectID } = require('bson');
-var jwt = require('jsonwebtoken');
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -16,24 +14,6 @@ app.use(express.json())
 
 const uri = `mongodb+srv://${ process.env.DB_USER }:${ process.env.DB_PASS }@cluster0.6d5m3.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-
-
-//varifiying jwt 
-function varifyJWT(req, res, next) {
-    const authorization = req.headers.authorization;
-    if (!authorization) {
-        return res.status(401).send({ massage: 'unauthorized access' })
-    }
-    const token = authorization.split(' ')[1];
-    jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
-        if (err) {
-            res.status(403).send({ massage: 'forbidden Access' })
-        }
-        console.log('prev decoded email',decoded)
-        req.decoded = decoded;
-        next()
-    });
-}
 
 async function run() {
     try {
@@ -70,35 +50,27 @@ async function run() {
 
 
         //getting email based my order 
-        app.get('/orders', varifyJWT, async (req, res) => {
+        app.get('/orders', async (req, res) => {
             const email = req.query.email;
-            console.log('email',email)
-            const decodedEmail = req.decoded.email;
-            console.log('decoded email', decodedEmail)
-            if (email === decodedEmail) {
-                const query = { email: email };
-                const purchase = await ordersCollection.find(query).toArray();
-                return res.send(purchase);
-            }
-            else {
-                return res.status(403).send({massage:'forbidden access'})
-            }
+            const query = { email: email };
+            const purchase = await ordersCollection.find(query).toArray();
+            res.send(purchase);
         });
 
         //updating users information
-        app.put('/user/:email', async (req, res) => {
+        app.put('/user:email', async (req, res) => {
             const email = req.params.email;
             console.log(email)
             const userBody = req.body;
-            console.log(userBody)
             const filter = { email: email };
             const option = { upsert: true };
             const updatedDoc = {
-                $set: userBody
+                $set: {
+                    userBody,
+                }
             }
-            const result = await usersCollection.updateOne(filter, updatedDoc, option);
-            const token = jwt.sign({ email: email }, process.env.TOKEN_SECRET, { expiresIn: '24h' })
-            res.send({ result, token });
+            const result = await usersCollection.updateOne(filter, option, updatedDoc);
+            res.send(result);
         })
 
     }

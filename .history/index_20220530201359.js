@@ -26,9 +26,7 @@ function varifyJWT(req, res, next) {
     }
     const token = authorization.split(' ')[1];
     jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
-        if (err) {
-            res.status(403).send({ massage: 'forbidden Access' })
-        }
+        
         console.log('prev decoded email',decoded)
         req.decoded = decoded;
         next()

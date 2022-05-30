@@ -29,7 +29,7 @@ function varifyJWT(req, res, next) {
         if (err) {
             res.status(403).send({ massage: 'forbidden Access' })
         }
-        console.log('prev decoded email',decoded)
+        console.log(decoded)
         req.decoded = decoded;
         next()
     });
@@ -72,9 +72,9 @@ async function run() {
         //getting email based my order 
         app.get('/orders', varifyJWT, async (req, res) => {
             const email = req.query.email;
-            console.log('email',email)
-            const decodedEmail = req.decoded.email;
-            console.log('decoded email', decodedEmail)
+            console.log(email)
+            const decodedEmail = req.decoded;
+            console.log(decodedEmail)
             if (email === decodedEmail) {
                 const query = { email: email };
                 const purchase = await ordersCollection.find(query).toArray();

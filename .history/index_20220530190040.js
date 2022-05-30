@@ -25,13 +25,8 @@ function varifyJWT(req, res, next) {
         return res.status(401).send({ massage: 'unauthorized access' })
     }
     const token = authorization.split(' ')[1];
-    jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
-        if (err) {
-            res.status(403).send({ massage: 'forbidden Access' })
-        }
-        console.log('prev decoded email',decoded)
-        req.decoded = decoded;
-        next()
+    jwt.verify(token, 'shhhhh', function (err, decoded) {
+        console.log(decoded.foo) // bar
     });
 }
 
@@ -72,17 +67,11 @@ async function run() {
         //getting email based my order 
         app.get('/orders', varifyJWT, async (req, res) => {
             const email = req.query.email;
-            console.log('email',email)
-            const decodedEmail = req.decoded.email;
-            console.log('decoded email', decodedEmail)
-            if (email === decodedEmail) {
-                const query = { email: email };
-                const purchase = await ordersCollection.find(query).toArray();
-                return res.send(purchase);
-            }
-            else {
-                return res.status(403).send({massage:'forbidden access'})
-            }
+            const authorization = req.headers.authorization;
+            console.log(authorization)
+            const query = { email: email };
+            const purchase = await ordersCollection.find(query).toArray();
+            res.send(purchase);
         });
 
         //updating users information
