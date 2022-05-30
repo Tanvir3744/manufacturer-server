@@ -103,7 +103,7 @@ async function run() {
 
         //getting all the users who are loged in our website
         app.get('/user', varifyJWT, async (req, res) => {
-            const users = await usersCollection.find().toArray();
+            const users = await userCollection.find().toArray();
             res.send(users);
         });
 
