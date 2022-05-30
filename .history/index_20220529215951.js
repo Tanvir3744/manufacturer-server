@@ -20,7 +20,6 @@ async function run() {
         await client.connect();
         const database = client.db('manufacturedb').collection('parts')
         const ordersCollection = client.db('manufacturedb').collection('orders');
-        const usersCollection = client.db('manufacturedb').collection('users');
         //getting products from database
         app.get('/products', async (req, res) => {
             const query = {};
@@ -39,12 +38,12 @@ async function run() {
         //place order to database
         app.post('/orders', async (req, res) => {
             const product = req.body;
-            const query = { productName: product.name, email: product.email }
+            const query = { productName: tool.name, email: tool.email }
             const exists = await ordersCollection.findOne(query);
             if (exists) {
-                return res.send({ success: false, product: exists })
+                return res.send({ success: false, tool: exists })
             }
-            const result = await ordersCollection.insertOne(product);
+            const result = await ordersCollection.insertOne(tool);
             return res.send({ success: true, result });
         });
 
@@ -52,26 +51,11 @@ async function run() {
         //getting email based my order 
         app.get('/orders', async (req, res) => {
             const email = req.query.email;
-            const query = { email: email };
-            const purchase = await ordersCollection.find(query).toArray();
-            res.send(purchase);
-        });
-
-        //updating users information
-        app.put('/user:email', async (req, res) => {
-            const email = req.params.email;
             console.log(email)
-            const userBody = req.body;
-            const filter = { email: email };
-            const option = { upsert: true };
-            const updatedDoc = {
-                $set: {
-                    userBody,
-                }
-            }
-            const result = await usersCollection.updateOne(filter, option, updatedDoc);
-            res.send(result);
-        })
+             const query = { email: email };
+            const purchase = await purchasedCollection.find(query).toArray();
+            res.send(purchase); 
+        });
 
     }
     finally {

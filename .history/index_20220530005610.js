@@ -57,10 +57,9 @@ async function run() {
             res.send(purchase);
         });
 
-        //updating users information
+        //updating users informatino
         app.put('/user:email', async (req, res) => {
             const email = req.params.email;
-            console.log(email)
             const userBody = req.body;
             const filter = { email: email };
             const option = { upsert: true };
@@ -69,8 +68,7 @@ async function run() {
                     userBody,
                 }
             }
-            const result = await usersCollection.updateOne(filter, option, updatedDoc);
-            res.send(result);
+            const result = await usersCollection.updateOne(filter, option, updatedDoc)
         })
 
     }

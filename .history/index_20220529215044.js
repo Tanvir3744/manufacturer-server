@@ -20,7 +20,6 @@ async function run() {
         await client.connect();
         const database = client.db('manufacturedb').collection('parts')
         const ordersCollection = client.db('manufacturedb').collection('orders');
-        const usersCollection = client.db('manufacturedb').collection('users');
         //getting products from database
         app.get('/products', async (req, res) => {
             const query = {};
@@ -38,40 +37,34 @@ async function run() {
 
         //place order to database
         app.post('/orders', async (req, res) => {
-            const product = req.body;
-            const query = { productName: product.name, email: product.email }
-            const exists = await ordersCollection.findOne(query);
-            if (exists) {
-                return res.send({ success: false, product: exists })
-            }
-            const result = await ordersCollection.insertOne(product);
-            return res.send({ success: true, result });
+            const order = req.body;
+            const result = await ordersCollection.insertOne(order)
+            res.send(result)
         });
 
+        //update quantity
+        app.put('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const quantity = req.body;
+            const filter = { _id: ObjectId(id) };
+            const option = { upsert: true }
+            const updatedDoc = {
+                $set: quantity
+
+            }
+            const result = await bikesCollection.updateOne(filter, updatedDoc, option);
+            res.send(result);
+        })
 
         //getting email based my order 
         app.get('/orders', async (req, res) => {
-            const email = req.query.email;
-            const query = { email: email };
-            const purchase = await ordersCollection.find(query).toArray();
-            res.send(purchase);
-        });
-
-        //updating users information
-        app.put('/user:email', async (req, res) => {
-            const email = req.params.email;
-            console.log(email)
-            const userBody = req.body;
-            const filter = { email: email };
-            const option = { upsert: true };
-            const updatedDoc = {
-                $set: {
-                    userBody,
-                }
-            }
-            const result = await usersCollection.updateOne(filter, option, updatedDoc);
-            res.send(result);
+            const myOrders = req.query.orders;
+            console.log(myOrders)
+            const query = { myOrders: myOrders }
+            const result = await ordersCollection.find(query).toArray;
+            res.send(result)
         })
+
 
     }
     finally {
