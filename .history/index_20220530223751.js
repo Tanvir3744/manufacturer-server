@@ -71,7 +71,7 @@ async function run() {
 
 
         //getting email based my order 
-        app.get('/orders', varifyJWT, async (req, res) => {
+        app.get('/orders',  async (req, res) => {
             const email = req.query.email;
             console.log('email', email)
             const decodedEmail = req.decoded.email;
@@ -102,35 +102,20 @@ async function run() {
             res.send({ result, token });
         })
 
-        //making this user to admin
-        app.put('/user/admin/:email', varifyJWT, async (req, res) => {
-            const email = req.params.email;
-            const filter = { email: email };
-            const updateDoc = {
-                $set: { role: 'admin' },
-            };
-            const result = await usersCollection.updateOne(filter, updateDoc);
-            res.send(result);
-        })
-
-        //getting admin role
-        app.get('/admin/:email', async (req, res) => {
-            const email = req.params.email;
-            const user = await usersCollection.findOne({ email: email });
-            const isAdmin = user?.role === 'admin';
-            res.send({ admin: isAdmin })
-        })
-
-
         //getting all the users who are loged in our website
-        app.get('/user', async (req, res) => {
+        app.get('/user',  async (req, res) => {
             const users = await usersCollection.find().toArray();
             res.send(users);
         });
 
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await usersCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
+          })
 
-
-
+        
         //review
         app.post('/review', async (req, res) => {
             const data = req.body;

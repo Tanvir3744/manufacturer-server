@@ -103,22 +103,19 @@ async function run() {
         })
 
         //making this user to admin
-        app.put('/user/admin/:email', varifyJWT, async (req, res) => {
+        app.put('/user/admin/:email', async (req, res) => {
             const email = req.params.email;
+            console.log(email)
+            const userBody = req.body;
+            console.log(userBody)
             const filter = { email: email };
-            const updateDoc = {
-                $set: { role: 'admin' },
-            };
-            const result = await usersCollection.updateOne(filter, updateDoc);
-            res.send(result);
-        })
-
-        //getting admin role
-        app.get('/admin/:email', async (req, res) => {
-            const email = req.params.email;
-            const user = await usersCollection.findOne({ email: email });
-            const isAdmin = user?.role === 'admin';
-            res.send({ admin: isAdmin })
+            const option = { upsert: true };
+            const updatedDoc = {
+                $set: userBody
+            }
+            const result = await usersCollection.updateOne(filter, updatedDoc, option);
+            const token = jwt.sign({ email: email }, process.env.TOKEN_SECRET, { expiresIn: '24h' })
+            res.send({ result, token });
         })
 
 
@@ -128,7 +125,12 @@ async function run() {
             res.send(users);
         });
 
-
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await usersCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
+        })
 
 
         //review
