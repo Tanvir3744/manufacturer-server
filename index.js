@@ -19,21 +19,21 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 
 //varifiying jwt 
-function varifyJWT(req, res, next) {
-    const authorization = req.headers.authorization;
-    if (!authorization) {
-        return res.status(401).send({ massage: 'unauthorized access' })
-    }
-    const token = authorization.split(' ')[1];
-    jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
-        if (err) {
-            res.status(403).send({ massage: 'forbidden Access' })
-        }
-        console.log('prev decoded email', decoded)
-        req.decoded = decoded;
-        next()
-    });
-}
+// function varifyJWT(req, res, next) {
+//     /* const authorization = req.headers.authorization; */
+//     if (!authorization) {
+//         return res.status(401).send({ massage: 'unauthorized access' })
+//     }
+//     const token = authorization.split(' ')[1];
+//     jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
+//         if (err) {
+//             res.status(403).send({ massage: 'forbidden Access' })
+//         }
+//         console.log('prev decoded email', decoded)
+//         req.decoded = decoded;
+//         next()
+//     });
+// }
 
 async function run() {
     try {
